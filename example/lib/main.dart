@@ -115,7 +115,7 @@ class _StoryPageState extends State<StoryPage> {
         itemBuilder: (context, pageIndex, storyIndex) {
           final user = sampleUsers[pageIndex];
           final story = user.stories[storyIndex];
-          return Stack(
+          return WidgetWithDuration(Stack(
             children: [
               Positioned.fill(
                 child: Container(color: Colors.black),
@@ -156,10 +156,10 @@ class _StoryPageState extends State<StoryPage> {
                 ),
               ),
             ],
-          );
+          ), Duration(seconds: 3));
         },
         gestureItemBuilder: (context, pageIndex, storyIndex) {
-          return Stack(children: [
+          return WidgetWithDuration(Stack(children: [
             Align(
               alignment: Alignment.topRight,
               child: Padding(
@@ -189,7 +189,7 @@ class _StoryPageState extends State<StoryPage> {
                           padding: EdgeInsets.all(24),
                           child: Text(
                             'Look! The indicator is now paused\n\n'
-                            'It will be coutinued after closing the modal bottom sheet.',
+                                'It will be coutinued after closing the modal bottom sheet.',
                             style: Theme.of(context).textTheme.headline5,
                             textAlign: TextAlign.center,
                           ),
@@ -201,7 +201,7 @@ class _StoryPageState extends State<StoryPage> {
                   },
                 ),
               ),
-          ]);
+          ]), Duration(seconds: 3));
         },
         indicatorAnimationController: indicatorAnimationController,
         initialStoryIndex: (pageIndex) {

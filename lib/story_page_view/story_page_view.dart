@@ -10,12 +10,19 @@ import 'package:story/story_page_view/story_stack_controller.dart';
 import 'components/gestures.dart';
 import 'components/indicators.dart';
 
-typedef _StoryItemBuilder = Widget Function(
+typedef _StoryItemBuilder = WidgetWithDuration Function(
     BuildContext context, int pageIndex, int storyIndex);
 
 typedef _StoryConfigFunction = int Function(int pageIndex);
 
 enum IndicatorAnimationCommand { pause, resume }
+
+class WidgetWithDuration {
+  Widget child;
+  Duration duration;
+
+  WidgetWithDuration(this.child, this.duration);
+}
 
 /// PageView to implement story like UI
 ///
@@ -30,7 +37,7 @@ class StoryPageView extends StatefulWidget {
     this.initialStoryIndex,
     this.initialPage = 0,
     this.onPageLimitReached,
-    this.indicatorDuration = const Duration(seconds: 5),
+    // this.indicatorDuration = const Duration(seconds: 5),
     this.indicatorPadding =
         const EdgeInsets.symmetric(vertical: 32, horizontal: 8),
     this.backgroundColor = Colors.black,
@@ -58,7 +65,7 @@ class StoryPageView extends StatefulWidget {
   final EdgeInsetsGeometry indicatorPadding;
 
   /// duration of [Indicators]
-  final Duration indicatorDuration;
+  // final Duration indicatorDuration;
 
   /// Called when the very last story is finished.
   ///
@@ -136,7 +143,13 @@ class _StoryPageViewState extends State<StoryPageView> {
                   onPageLimitReached: widget.onPageLimitReached,
                   itemBuilder: widget.itemBuilder,
                   gestureItemBuilder: widget.gestureItemBuilder,
-                  indicatorDuration: widget.indicatorDuration,
+                  indicatorDuration: widget
+                      .itemBuilder(
+                        context,
+                        index,
+                        context.watch<StoryStackController>().value,
+                      )
+                      .duration,
                   indicatorPadding: widget.indicatorPadding,
                   indicatorAnimationController:
                       widget.indicatorAnimationController,
@@ -303,11 +316,13 @@ class _StoryPageFrameState extends State<_StoryPageFrame>
           ),
         ),
         Positioned.fill(
-          child: widget.itemBuilder(
-            context,
-            widget.pageIndex,
-            context.watch<StoryStackController>().value,
-          ),
+          child: widget
+              .itemBuilder(
+                context,
+                widget.pageIndex,
+                context.watch<StoryStackController>().value,
+              )
+              .child,
         ),
         Container(
           height: 50,
@@ -332,11 +347,13 @@ class _StoryPageFrameState extends State<_StoryPageFrame>
           animationController: animationController,
         ),
         Positioned.fill(
-          child: widget.gestureItemBuilder?.call(
-                context,
-                widget.pageIndex,
-                context.watch<StoryStackController>().value,
-              ) ??
+          child: widget.gestureItemBuilder
+                  ?.call(
+                    context,
+                    widget.pageIndex,
+                    context.watch<StoryStackController>().value,
+                  )
+                  .child ??
               const SizedBox.shrink(),
         ),
       ],
